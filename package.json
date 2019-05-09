@@ -1,0 +1,24 @@
+{
+  "name": "workflow-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preenable": "npm install",
+    "enable": "npm link"
+  },
+  "bin": {
+    "flow": "./src/main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "inquirer": "^6.3.1",
+    "node-fetch": "^2.4.1",
+    "simple-git": "^1.110.0",
+    "xml2js": "^0.4.19"
+  }
+}
