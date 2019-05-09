@@ -4,7 +4,7 @@ const config = require('../config');
 class Update extends cli.ShellCommand {
 
     static command = 'update';
-    static description = "auto-update workflow-cli";
+    static description = "update workflow-cli";
 
     static execute() {
         const child = this.spawnProcess('git', ['pull', 'origin', 'master'], __dirname)
