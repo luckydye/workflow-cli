@@ -1,4 +1,5 @@
 const chalk = require('chalk');
+const config = require('./config');
 
 let lastlog = "";
 
@@ -198,6 +199,10 @@ module.exports = class cli extends Command {
 
     static get ShellCommand() {
         return ShellCommand;
+    }
+
+    static get config() {
+        return config;
     }
 
     static arguments = [
