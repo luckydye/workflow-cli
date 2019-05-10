@@ -1,7 +1,7 @@
 {
   "name": "workflow-cli",
   "version": "1.0.0",
-  "description": "",
+  "description": "Easy to use cli script.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,10 +12,22 @@
     "flow": "./src/main.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Tim Havlicek",
   "license": "ISC",
   "dependencies": {
     "chalk": "^2.4.2",
     "inquirer": "^6.3.1"
-  }
+  },
+  "directories": {
+    "example": "examples"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luckydye/workflow-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/luckydye/workflow-cli/issues"
+  },
+  "homepage": "https://github.com/luckydye/workflow-cli#readme"
 }
