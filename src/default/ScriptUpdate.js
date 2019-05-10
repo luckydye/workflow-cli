@@ -1,4 +1,5 @@
 const cli = require('../cli');
+const log = require('../logging');
 const config = require('../config');
 
 class Update extends cli.ShellCommand {
@@ -17,7 +18,7 @@ class Update extends cli.ShellCommand {
 function checkAutoUpdate() {
     const lastupdate = config.get('lastupdate');
     if(Date.now() - lastupdate > 1000 * 60 * 60 * 24 * 7) {
-        cli.log('Running autoupdate');
+        log.log('Running autoupdate');
         Update.execute();
     }
 }

@@ -1,5 +1,6 @@
-const cli = require('../cli.js');
-const config = require('../config.js');
+const cli = require('../cli');
+const log = require('../logging');
+const config = require('../config');
 const fs = require('fs');
 
 function initScripts() {
@@ -22,7 +23,7 @@ function initScripts() {
             }
             cli.addCommands(command);
         } else {
-            cli.warn('Script not found:', scripts[key]);
+            log.warn('Script not found:', scripts[key]);
         }
     }
 }
@@ -72,7 +73,7 @@ module.exports = class Scripts extends cli.Command {
 
     static show() {
         for(let script in config.get('scripts')) {
-            cli.log(script, config.get('scripts')[script], script.description);
+            log.log(script, config.get('scripts')[script], script.description);
         }
     }
 

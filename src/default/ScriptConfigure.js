@@ -1,5 +1,6 @@
-const cli = require('../cli.js');
-const config = require('../config.js');
+const cli = require('../cli');
+const log = require('../logging');
+const config = require('../config');
 
 module.exports = class Configure extends cli.Command {
 
@@ -31,7 +32,7 @@ module.exports = class Configure extends cli.Command {
                 configObject[key] = config[key];
             }
         }
-        cli.log(configObject);
+        log.log(configObject);
     }
 
 }
