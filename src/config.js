@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const cli = require('./cli.js');
 
 const CONFIG_NAME = require('../package.json').name+'.json';
 const CONFIG_PATH = path.resolve(process.env.USERPROFILE, CONFIG_NAME);
@@ -30,24 +29,24 @@ class Config {
 
     saveToFile() {
         const err = fs.writeFileSync(CONFIG_PATH, JSON.stringify(this.store, null, '\t'));
-        if(err) return cli.error(err);
+        if(err) return console.error(err);
     }
 
     loadFromFile() {
         try {
             if(fs.existsSync(ALT_CONFIG_PATH)) {
-                cli.info('Using local config');
+                console.log('Using local config');
                 this.store = require(ALT_CONFIG_PATH);
             }
             if(!fs.existsSync(CONFIG_PATH)) {
                 this.saveToFile();
-                cli.info("Config created");
+                console.log("Config created");
                 this.store = require(CONFIG_PATH);
             } else {
                 this.store = require(CONFIG_PATH);
             }
         } catch(err) {
-            cli.error('Error getting config file', err);
+            console.error('Error getting config file', err);
         }
     }
 
