@@ -6,14 +6,21 @@ class Command {
 
     // command name
     static command = "";
+
     // command description
     static description = "";
+
     // command alias
     static alias = null;
+
     // command arguments/commands
     static arguments = [];
+
     // required config parameters for this command
     static required = [];
+
+    // timestamp of creation for new higlighting
+    static added = 0;
 
     // execute command
     static execute(args) {
@@ -29,7 +36,7 @@ class Command {
         }
     }
 
-    // script loaded
+    // script loading
     static load(args) {
         
     }
@@ -70,25 +77,25 @@ class Command {
 
     // check if required config params are set
     static async checkConfigParams(command, config) {
-        if(command.required) {
-            for(let param of command.required) {
-                if(!config.get(param)) {
-                    const inquirer = require('inquirer');
-                    function ask() {
-                        return inquirer.prompt([{
-                            type: "input",
-                            name: 'input',
-                            message: `Missing config parameter: ${param}\n>`
-                        }]).then(answers => {
-                            if(!answers.input) {
-                                return ask();
-                            } else {
-                                config.set(param, answers.input);
-                            }
-                        });
-                    }
-                    return ask();
+        const requiredParams = command.required || [];
+        
+        for(let param of requiredParams) {
+            if(!config.get(param)) {
+                const inquirer = require('inquirer');
+                function ask() {
+                    return inquirer.prompt([{
+                        type: "input",
+                        name: 'input',
+                        message: `Missing config parameter: ${param}\n>`
+                    }]).then(answers => {
+                        if(!answers.input) {
+                            return ask();
+                        } else {
+                            config.set(param, answers.input);
+                        }
+                    });
                 }
+                return ask();
             }
         }
     }
@@ -134,10 +141,12 @@ class Command {
         for(let arg of this.arguments) {
             if(arg.command) {
                 let command = arg.command.padEnd(12, " ");
+                let desciption = arg.description || "no desciption";
+                let isNew = (Date.now() - arg.added) < (1000 * 60 * 60 * 24 * 7 * 2);
                 if(arg.alias) {
                     command = command.replace(arg.alias, chalk.underline(arg.alias));
                 }
-                log.log(` ${command}  |  ${arg.description || "no desciption"}`);
+                log.log(` ${command} ${isNew ? chalk.green.bold('new') : '   '} | ${desciption}`);
             }
         }
         log.log();
