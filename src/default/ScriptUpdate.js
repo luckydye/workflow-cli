@@ -4,6 +4,14 @@ const config = require('../config');
 
 class Update extends cli.ShellCommand {
 
+    static load() {
+        const lastupdate = config.get('lastupdate');
+        if(Date.now() - lastupdate > 1000 * 60 * 60 * 24 * 7) {
+            log.log('Running autoupdate');
+            Update.execute();
+        }
+    }
+
     static command = 'update';
     static description = "update workflow-cli";
 
@@ -14,14 +22,5 @@ class Update extends cli.ShellCommand {
         return child;
     }
 }
-
-function checkAutoUpdate() {
-    const lastupdate = config.get('lastupdate');
-    if(Date.now() - lastupdate > 1000 * 60 * 60 * 24 * 7) {
-        log.log('Running autoupdate');
-        Update.execute();
-    }
-}
-checkAutoUpdate();
 
 module.exports = Update;

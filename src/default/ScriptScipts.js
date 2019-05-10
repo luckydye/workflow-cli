@@ -3,23 +3,24 @@ const log = require('../logging');
 const config = require('../config');
 const fs = require('fs');
 
-function initScripts() {
-    const scripts = config.get('scripts') || {};
+module.exports = class Scripts extends cli.Command {
 
-    for(let key in scripts) {
-        if(fs.existsSync(scripts[key])) {
-            const script = require(scripts[key]);
-            script.description = script.description || scripts[key];
-            cli.addCommands(script);
-        } else {
-            log.warn('Script not found:', scripts[key]);
+    static load() {
+        const scripts = config.get('scripts') || {};
+        for(let key in scripts) {
+            if(fs.existsSync(scripts[key])) {
+                const script = require(scripts[key]);
+                script.description = script.description || scripts[key];
+                if(script.command) {
+                    cli.addCommands(script);
+                } else {
+                    log.error('Script', key, 'has no command defined.');
+                }
+            } else {
+                log.warn('Script not found:', scripts[key]);
+            }
         }
     }
-}
-
-initScripts();
-
-module.exports = class Scripts extends cli.Command {
 
     static command = "scripts";
     static alias = "s";
@@ -72,6 +73,7 @@ module.exports = class Scripts extends cli.Command {
         }
         delete config.get('scripts')[name];
         config.saveToFile();
+        log.info('Script removed', name);
     }
 
     static addScript(name, path) {
@@ -80,6 +82,7 @@ module.exports = class Scripts extends cli.Command {
         }
         config.scripts = config.get('scripts') || {};
         config.scripts[name] = path;
-        config.saveToFile();
+        config.set('scripts', config.scripts);
+        log.info('Script added', name);
     }
 }

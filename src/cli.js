@@ -24,6 +24,11 @@ class Command {
         }
     }
 
+    // script loaded
+    static load(name) {
+        
+    }
+
     // resolve command arguments
     static resolvearguments(args) {
         const config = require('./config.js');
@@ -32,21 +37,26 @@ class Command {
         let valid = false;
 
         for(let arguemnt of this.arguments) {
-            const cmdTest = arguemnt.command === command;
-            const aliasTest = arguemnt.alias && arguemnt.alias === command;
-
-            if( cmdTest || aliasTest ) {
-                valid = true;
-                try {
-                    this.checkConfigParams(arguemnt, config).then(() => {
-                        return arguemnt.execute(args.slice(1));
-                    }).catch(err => {
-                        log.error(err);
-                    })
-                } catch(err) {
-                    log.error('Error executing command:', err);
+            if(arguemnt.load) {
+                arguemnt.load(command);
+            }
+            if(arguemnt.command) {
+                const cmdTest = arguemnt.command === command;
+                const aliasTest = arguemnt.alias && arguemnt.alias === command;
+    
+                if( cmdTest || aliasTest ) {
+                    valid = true;
+                    try {
+                        this.checkConfigParams(arguemnt, config).then(() => {
+                            return arguemnt.execute(args.slice(1));
+                        }).catch(err => {
+                            log.error(err);
+                        })
+                    } catch(err) {
+                        log.error('Error executing command:', err);
+                    }
+                    break;
                 }
-                break;
             }
         }
 
@@ -87,11 +97,13 @@ class Command {
         log.headline(header);
         
         for(let arg of this.arguments) {
-            let command = arg.command.padEnd(12, " ");
-            if(arg.alias) {
-                command = command.replace(arg.alias, chalk.underline(arg.alias));
+            if(arg.command) {
+                let command = arg.command.padEnd(12, " ");
+                if(arg.alias) {
+                    command = command.replace(arg.alias, chalk.underline(arg.alias));
+                }
+                log.log(` ${command}  |  ${arg.description || "no desciption"}`);
             }
-            log.log(` ${command}  |  ${arg.description || "no desciption"}`);
         }
         log.log();
     }
@@ -169,7 +181,9 @@ module.exports = class cli extends Command {
 
     static addCommands(...cmds) {
         for(let cmd of cmds) {
-            this.arguments.push(cmd);
+            if(this.arguments.indexOf(cmd) === -1) {
+                this.arguments.push(cmd);
+            }
         }
     }
 }
