@@ -16,6 +16,7 @@ class Update extends cli.ShellCommand {
     static description = "update workflow-cli";
 
     static execute() {
+        log.title('Updating workflow-cli');
         const child = this.spawnProcess('git', ['pull', 'origin', 'master'], __dirname)
         child.then(() => this.spawnProcess('npm', ['run', 'enable'], __dirname))
         config.set('lastupdate', Date.now());

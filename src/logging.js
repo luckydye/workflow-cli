@@ -47,6 +47,10 @@ module.exports = {
         process.stdout.clearLine();
         process.stdout.cursorTo(0, process.stdout.rows - (linecount+1));
         this[logType](str);
+    },
+
+    title(str) {
+        process.stdout.write(String.fromCharCode(27) + "]0;" + str + String.fromCharCode(7));
     }
 
 }
