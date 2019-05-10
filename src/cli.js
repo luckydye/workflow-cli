@@ -17,6 +17,11 @@ class Command {
 
     // execute command
     static execute(args) {
+        // initialize arguemnts
+        for(let arg of this.arguments) {
+            if(arg.load) arg.load();
+        }
+        // resolve arguemnts
         if(args.length > 0) {
             this.resolvearguments(args);
         } else {
@@ -25,7 +30,7 @@ class Command {
     }
 
     // script loaded
-    static load(name) {
+    static load(args) {
         
     }
 
@@ -37,9 +42,6 @@ class Command {
         let valid = false;
 
         for(let arguemnt of this.arguments) {
-            if(arguemnt.load) {
-                arguemnt.load(command);
-            }
             if(arguemnt.command) {
                 const cmdTest = arguemnt.command === command;
                 const aliasTest = arguemnt.alias && arguemnt.alias === command;
@@ -90,23 +92,6 @@ class Command {
             }
         }
     }
-    
-    // display all available arguments to the console
-    static help() {
-        const header = `Available arguments${this.command ? ' for ' + this.command : ''}:`;
-        log.headline(header);
-        
-        for(let arg of this.arguments) {
-            if(arg.command) {
-                let command = arg.command.padEnd(12, " ");
-                if(arg.alias) {
-                    command = command.replace(arg.alias, chalk.underline(arg.alias));
-                }
-                log.log(` ${command}  |  ${arg.description || "no desciption"}`);
-            }
-        }
-        log.log();
-    }
 
     static spawnProcess(exe, args, root) {
         return new Promise((resolve, reject) => {
@@ -139,6 +124,23 @@ class Command {
                 resolve(answers);
             });
         })
+    }
+    
+    // display all available arguments to the console
+    static help() {
+        const header = `Available arguments${this.command ? ' for ' + this.command : ''}:`;
+        log.headline(header);
+        
+        for(let arg of this.arguments) {
+            if(arg.command) {
+                let command = arg.command.padEnd(12, " ");
+                if(arg.alias) {
+                    command = command.replace(arg.alias, chalk.underline(arg.alias));
+                }
+                log.log(` ${command}  |  ${arg.description || "no desciption"}`);
+            }
+        }
+        log.log();
     }
 }
 
