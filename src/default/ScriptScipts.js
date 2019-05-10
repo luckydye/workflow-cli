@@ -9,19 +9,8 @@ function initScripts() {
     for(let key in scripts) {
         if(fs.existsSync(scripts[key])) {
             const script = require(scripts[key]);
-            const command = {
-                command: script.command,
-                alias: script.alias,
-                description: script.description || scripts[key],
-                execute: (args) => {
-                    if(script.execute) {
-                        script.execute(args);
-                    } else {
-                        throw 'Missing execute function in script';
-                    }
-                }
-            }
-            cli.addCommands(command);
+            script.description = script.description || scripts[key];
+            cli.addCommands(script);
         } else {
             log.warn('Script not found:', scripts[key]);
         }
