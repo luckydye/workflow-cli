@@ -3,9 +3,9 @@
 const cli = require('./cli');
 
 cli.addCommands(
-    require('./default/ScriptConfigure'),
-    require('./default/ScriptUpdate'),
-    require('./default/ScriptScipts'),
+    require('./default/ScriptConfigure.js'),
+    require('./default/ScriptUpdate.js'),
+    require('./default/ScriptScipts.js'),
 );
 
 cli.execute(process.argv.slice(2));
