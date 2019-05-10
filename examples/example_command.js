@@ -1,4 +1,4 @@
-const { Command } = require('../src/cli.js');
+const { Command, log } = require('../src/cli.js');
 
 module.exports = class Example extends Command {
 
@@ -23,7 +23,7 @@ module.exports = class Example extends Command {
         const n = parseInt(value);
         if(n) {
             for(let i = 0; i < n; i++) {
-                this.log(Math.sin(i));
+                log.log(Math.sin(i));
             }
         } else {
             throw "Not a number";
@@ -31,6 +31,6 @@ module.exports = class Example extends Command {
     }
 
     static two() {
-        this.log('nothing here');
+        log.log('nothing here');
     }
 }
