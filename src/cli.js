@@ -1,14 +1,6 @@
 const chalk = require('chalk');
 const config = require('./config');
-
-let lastlog = "";
-
-function formatPrefix(str, loglevel) {
-    let prefix = lastlog == loglevel ? '' : str;
-    prefix = prefix.padEnd(5, " ");
-    lastlog = loglevel;
-    return prefix;
-}
+const log = require('./logging');
 
 class Command {
 
@@ -22,44 +14,6 @@ class Command {
     static arguments = [];
     // required config parameters for this command
     static required = [];
-
-    static prefix = "";
-
-    static log(...str) {
-        if(this.prefix) {
-            let prefix = formatPrefix(this.prefix, 0);
-            console.log(prefix, ...str);
-        } else {
-            lastlog = 0;
-            console.log(...str);
-        }
-    }
-
-    static error(...str) {
-        let prefix = formatPrefix('Error', 1);
-        console.error(chalk.bgWhite.red(prefix), ...str);
-    }
-
-    static info(...str) {
-        let prefix = formatPrefix('Info', 2);
-        console.log(chalk.bgWhite.black(prefix), ...str);
-    }
-
-    static warn(...str) {
-        let prefix = formatPrefix('Warning', 3);
-        console.log(chalk.bgBlack.yellow(prefix), ...str);
-    }
-
-    static headline(str) {
-        lastlog = 0;
-        console.log(chalk.black.bgWhite('\n', str.padEnd(52, " ")), "\n");
-    }
-
-    static updateLine(logType, str, linecount = 1) {
-        process.stdout.clearLine();
-        process.stdout.cursorTo(0, process.stdout.rows - (linecount+1));
-        this[logType](str);
-    }
 
     // execute command
     static execute(args) {
@@ -87,17 +41,17 @@ class Command {
                     this.checkConfigParams(arguemnt, config).then(() => {
                         return arguemnt.execute(args.slice(1));
                     }).catch(err => {
-                        this.error(err);
+                        log.error(err);
                     })
                 } catch(err) {
-                    this.error('Error executing command:', err);
+                    log.error('Error executing command:', err);
                 }
                 break;
             }
         }
 
         if(!valid) {
-            this.info("Invalid argument");
+            log.info("Invalid argument");
             this.help();
         }
     }
@@ -130,16 +84,16 @@ class Command {
     // display all available arguments to the console
     static help() {
         const header = `Available arguments${this.command ? ' for ' + this.command : ''}:`;
-        this.headline(header);
+        log.headline(header);
         
         for(let arg of this.arguments) {
             let command = arg.command.padEnd(12, " ");
             if(arg.alias) {
                 command = command.replace(arg.alias, chalk.underline(arg.alias));
             }
-            this.log(` ${command}  |  ${arg.description || "no desciption"}`);
+            log.log(` ${command}  |  ${arg.description || "no desciption"}`);
         }
-        this.log();
+        log.log();
     }
 
     static spawnProcess(exe, args, root) {
@@ -158,7 +112,7 @@ class Command {
                 }
             });
         }).catch(err => {
-            this.error('Command exited with code', err);
+            log.error('Command exited with code', err);
         })
     }
 
