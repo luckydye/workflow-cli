@@ -53,13 +53,13 @@ module.exports = class Scripts extends cli.Command {
             ext = ext[ext.length-1];
             valid = ext === 'js';
         }
-        const abolutePath = path.resolve(process.env.USERPROFILE, filePath);
+        const abolutePath = path.resolve(config.location, filePath);
 
         if(filePath && valid) {
             const p = filePath.split("/")[0].split("\\");
             this.addScript(p[p.length-1].split(".")[0], abolutePath);
         } else {
-            throw `Inavlid path ${abolutePath}`;
+            throw `Inavlid script path ${abolutePath}`;
         }
     }
 

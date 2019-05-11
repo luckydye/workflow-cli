@@ -20,6 +20,10 @@ class Config {
         this.loadFromFile();
     }
 
+    get location() {
+        return path.parse(this.configLocation).dir;
+    }
+
     set(key, value) {
         if(key && value) {
             this.store[key] = value;
@@ -44,15 +48,15 @@ class Config {
         try {
             if(fs.existsSync(ALT_CONFIG_PATH)) {
                 log.info('Using local config');
-                this.store = require(ALT_CONFIG_PATH);
-            }
-            if(!fs.existsSync(CONFIG_PATH)) {
+                this.configLocation = ALT_CONFIG_PATH;
+            } else if(!fs.existsSync(CONFIG_PATH)) {
                 this.saveToFile();
                 log.info("Config created");
-                this.store = require(CONFIG_PATH);
+                this.configLocation = CONFIG_PATH;
             } else {
-                this.store = require(CONFIG_PATH);
+                this.configLocation = CONFIG_PATH;
             }
+            this.store = require(this.configLocation);
         } catch(err) {
             log.error('Error getting config file', err);
         }
