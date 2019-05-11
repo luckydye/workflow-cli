@@ -21,6 +21,12 @@ class Command {
 
     // timestamp of creation for new higlighting
     static added = 0;
+    
+    // executable path
+    static executable = null;
+
+    // executable parameters
+    static parameters = [];
 
     // execute command
     static execute(args) {
@@ -28,11 +34,16 @@ class Command {
         for(let arg of this.arguments) {
             if(arg.load) arg.load();
         }
-        // resolve arguemnts
-        if(args.length > 0) {
-            this.resolvearguments(args);
-        } else {
+
+        if(args.length < 1) {
             this.help();
+            return;
+        }
+
+        if(this.executable !== null) {
+            this.spawnProcess(this.executable, [...this.parameters, ...args.slice(1)]);
+        } else {
+            this.resolvearguments(args);
         }
     }
 
@@ -153,21 +164,6 @@ class Command {
     }
 }
 
-class ShellCommand extends Command {
-    
-    static command = "shell";
-    static description = "executes shell script";
-    
-    // executable path
-    static executable = "bash";
-    // executable parameters
-    static parameters = ["echo", "test shell script"];
-    
-    static execute(args) {
-        this.spawnProcess(this.executable, [...this.parameters, ...args]);
-    }
-}
-
 module.exports = class cli extends Command {
 
     static get Command() {
@@ -175,7 +171,7 @@ module.exports = class cli extends Command {
     }
 
     static get ShellCommand() {
-        return ShellCommand;
+        return Command;
     }
 
     static get config() {

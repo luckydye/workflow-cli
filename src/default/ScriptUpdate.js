@@ -2,7 +2,7 @@ const cli = require('../cli');
 const log = require('../logging');
 const config = require('../config');
 
-class Update extends cli.ShellCommand {
+class Update extends cli.Command {
 
     static load() {
         const lastupdate = config.get('lastupdate');

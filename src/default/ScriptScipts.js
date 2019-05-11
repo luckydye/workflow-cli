@@ -11,9 +11,10 @@ module.exports = class Scripts extends cli.Command {
         for(let key in scripts) {
             if(fs.existsSync(scripts[key])) {
                 const script = require(scripts[key]);
-                script.description = script.description || scripts[key];
                 if(script.command) {
-                    cli.addCommands(script);
+                    script.description = script.description || scripts[key];
+                    const command = Object.assign(cli.Command, script);
+                    cli.addCommands(command);
                 } else {
                     log.error('Script', key, 'has no command defined.');
                 }
@@ -46,14 +47,15 @@ module.exports = class Scripts extends cli.Command {
     ]
 
     static add(filePath) {
-        let valid = Boolean(fs.existsSync(filePath));
+        const abolutePath = path.resolve(config.location, filePath);
+
+        let valid = Boolean(fs.existsSync(abolutePath));
         if(valid) {
-            valid = Boolean(fs.statSync(filePath).isFile());
-            let ext = filePath.split(".");
+            valid = Boolean(fs.statSync(abolutePath).isFile());
+            let ext = abolutePath.split(".");
             ext = ext[ext.length-1];
             valid = ext === 'js';
         }
-        const abolutePath = path.resolve(config.location, filePath);
 
         if(filePath && valid) {
             const p = filePath.split("/")[0].split("\\");
