@@ -8,6 +8,13 @@ const ALT_CONFIG_PATH = path.resolve(process.cwd(), CONFIG_NAME);
 
 class Config {
 
+    static getInstance() {
+        if(!globalThis.config) {
+            globalThis.config = new Config();
+        }
+        return globalThis.config;
+    }
+
     constructor() {
         this.store = {};
         this.loadFromFile();
@@ -53,4 +60,4 @@ class Config {
 
 }
 
-module.exports = new Config();
+module.exports = Config.getInstance();

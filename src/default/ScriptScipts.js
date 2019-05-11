@@ -2,6 +2,7 @@ const cli = require('../cli');
 const log = require('../logging');
 const config = require('../config');
 const fs = require('fs');
+const path = require('path');
 
 module.exports = class Scripts extends cli.Command {
 
@@ -44,12 +45,21 @@ module.exports = class Scripts extends cli.Command {
         }
     ]
 
-    static add(path) {
-        if(path) {
-            const p = path.split("/")[0].split("\\");
-            this.addScript(p[p.length-1].split(".")[0], path);
+    static add(filePath) {
+        let valid = Boolean(fs.existsSync(filePath));
+        if(valid) {
+            valid = Boolean(fs.statSync(filePath).isFile());
+            let ext = filePath.split(".");
+            ext = ext[ext.length-1];
+            valid = ext === 'js';
+        }
+        const abolutePath = path.resolve(process.env.USERPROFILE, filePath);
+
+        if(filePath && valid) {
+            const p = filePath.split("/")[0].split("\\");
+            this.addScript(p[p.length-1].split(".")[0], abolutePath);
         } else {
-            throw `Inavlid options ${arguments}`;
+            throw `Inavlid path ${abolutePath}`;
         }
     }
 
@@ -57,7 +67,7 @@ module.exports = class Scripts extends cli.Command {
         if(name) {
             this.removeScript(name);
         } else {
-            throw `Inavlid options ${arguments}`;
+            throw `Inavlid options "${name}"`;
         }
     }
 
