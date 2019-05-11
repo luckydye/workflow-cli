@@ -10,10 +10,10 @@ module.exports = class Scripts extends cli.Command {
         const scripts = config.get('scripts') || {};
         for(let key in scripts) {
             if(fs.existsSync(scripts[key])) {
-                const script = require(scripts[key]);
+                let script = require(scripts[key]);
                 if(script.command) {
                     script.description = script.description || scripts[key];
-                    const command = Object.assign(cli.Command, script);
+                    const command = Object.assign(class cmd extends cli.Command {}, script);
                     cli.addCommands(command);
                 } else {
                     log.error('Script', key, 'has no command defined.');
@@ -48,18 +48,20 @@ module.exports = class Scripts extends cli.Command {
 
     static add(filePath) {
         const abolutePath = path.resolve(config.location, filePath);
+        const parsed = path.parse(abolutePath);
+
+        if(parsed.name in config.get('scripts')) {
+            throw `Script already added ${parsed.name}`;
+        }
 
         let valid = Boolean(fs.existsSync(abolutePath));
         if(valid) {
             valid = Boolean(fs.statSync(abolutePath).isFile());
-            let ext = abolutePath.split(".");
-            ext = ext[ext.length-1];
-            valid = ext === 'js';
+            valid = parsed.ext === '.js';
         }
 
         if(filePath && valid) {
-            const p = filePath.split("/")[0].split("\\");
-            this.addScript(p[p.length-1].split(".")[0], abolutePath);
+            this.addScript(parsed.name, abolutePath);
         } else {
             throw `Inavlid script path ${abolutePath}`;
         }
@@ -74,9 +76,7 @@ module.exports = class Scripts extends cli.Command {
     }
 
     static show() {
-        for(let script in config.get('scripts')) {
-            log.log(script, config.get('scripts')[script], script.description);
-        }
+        log.log(config.get('scripts'));
     }
 
     static removeScript(name) {

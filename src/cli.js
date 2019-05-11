@@ -4,6 +4,11 @@ const log = require('./logging');
 
 class Command {
 
+    // script loading
+    static load(args) {
+        
+    }
+
     // command name
     static command = "";
 
@@ -35,21 +40,16 @@ class Command {
             if(arg.load) arg.load();
         }
 
-        if(args.length < 1) {
-            this.help();
-            return;
-        }
-
         if(this.executable !== null) {
             this.spawnProcess(this.executable, [...this.parameters, ...args.slice(1)]);
         } else {
-            this.resolvearguments(args);
+            if(args.length < 1) {
+                this.help();
+                return;
+            } else {
+                this.resolvearguments(args);
+            }
         }
-    }
-
-    // script loading
-    static load(args) {
-        
     }
 
     // resolve command arguments
