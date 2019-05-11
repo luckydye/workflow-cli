@@ -9,8 +9,9 @@ module.exports = class Scripts extends cli.Command {
     static load() {
         const scripts = config.get('scripts') || {};
         for(let key in scripts) {
-            if(fs.existsSync(scripts[key])) {
-                let script = require(scripts[key]);
+            const abolutePath = path.resolve(config.location, scripts[key]);
+            if(fs.existsSync(abolutePath)) {
+                let script = require(abolutePath);
                 if(script.command) {
                     script.description = script.description || scripts[key];
                     const command = Object.assign(class cmd extends cli.Command {}, script);
@@ -61,7 +62,7 @@ module.exports = class Scripts extends cli.Command {
         }
 
         if(filePath && valid) {
-            this.addScript(parsed.name, abolutePath);
+            this.addScript(parsed.name, filePath);
         } else {
             throw `Inavlid script path ${abolutePath}`;
         }
