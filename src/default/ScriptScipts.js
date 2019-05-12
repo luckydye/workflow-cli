@@ -1,21 +1,22 @@
-const cli = require('../cli');
-const log = require('../logging');
-const config = require('../config');
 const fs = require('fs');
 const path = require('path');
+const CommandLine = require('../CommandLine');
+const Command = require('../Command');
+const log = require('../Logger');
+const Config = require('../Config');
 
-module.exports = class Scripts extends cli.Command {
+module.exports = class ScriptScripts extends Command {
 
     static load() {
-        const scripts = config.get('scripts') || {};
+        const scripts = Config.get('scripts') || {};
         for(let key in scripts) {
-            const abolutePath = path.resolve(config.location, scripts[key]);
+            const abolutePath = path.resolve(Config.location, scripts[key]);
             if(fs.existsSync(abolutePath)) {
                 let script = require(abolutePath);
                 if(script.command) {
                     script.description = script.description || scripts[key];
-                    const command = Object.assign(class cmd extends cli.Command {}, script);
-                    cli.addCommands(command);
+                    const command = Object.assign(class cmd extends Command {}, script);
+                    CommandLine.addCommands(command);
                 } else {
                     log.error('Script', key, 'has no command defined.');
                 }
@@ -32,12 +33,14 @@ module.exports = class Scripts extends cli.Command {
     static arguments = [
         {
             command: 'add',
-            description: "<path> add script path to scripts",
+            usage: "<path>",
+            description: "add script path to scripts",
             execute: (args) => this.add(...args)
         },
         {
             command: 'remove',
-            description: "<name> remove script from scripts",
+            usage: "<name>",
+            description: "remove script from scripts",
             execute: (args) => this.remove(...args)
         },
         {
@@ -48,10 +51,10 @@ module.exports = class Scripts extends cli.Command {
     ]
 
     static add(filePath) {
-        const abolutePath = path.resolve(config.location, filePath);
+        const abolutePath = path.resolve(Config.location, filePath);
         const parsed = path.parse(abolutePath);
 
-        if(parsed.name in config.get('scripts')) {
+        if(parsed.name in Config.get('scripts')) {
             throw `Script already added ${parsed.name}`;
         }
 
@@ -77,15 +80,15 @@ module.exports = class Scripts extends cli.Command {
     }
 
     static show() {
-        log.log(config.get('scripts'));
+        log.log(Config.get('scripts'));
     }
 
     static removeScript(name) {
-        if(!config.get('scripts')[name]) {
+        if(!Config.get('scripts')[name]) {
             throw "script not found";
         }
-        delete config.get('scripts')[name];
-        config.saveToFile();
+        delete Config.get('scripts')[name];
+        Config.saveToFile();
         log.info('Script removed', name);
     }
 
@@ -93,9 +96,9 @@ module.exports = class Scripts extends cli.Command {
         if(!path) {
             throw "provide path to script";
         }
-        config.scripts = config.get('scripts') || {};
-        config.scripts[name] = path;
-        config.set('scripts', config.scripts);
+        const scripts = Config.get('scripts') || {};
+        scripts[name] = path;
+        Config.set('scripts', scripts);
         log.info('Script added', name);
     }
 }

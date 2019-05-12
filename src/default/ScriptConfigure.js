@@ -1,8 +1,8 @@
-const cli = require('../cli');
-const log = require('../logging');
-const config = require('../config');
+const Command = require('../Command');
+const log = require('../Logger');
+const Config = require('../Config');
 
-module.exports = class Configure extends cli.Command {
+module.exports = class ScriptConfigure extends Command {
 
     static command = 'config';
     static alias = 'c';
@@ -11,7 +11,8 @@ module.exports = class Configure extends cli.Command {
     static arguments = [
         {
             command: "set",
-            description: "<key> <value> set config parameter",
+            usage: "<key> <value>",
+            description: "set config parameter",
             execute: (args) => this.set(...args)
         },
         {
@@ -22,17 +23,11 @@ module.exports = class Configure extends cli.Command {
     ]
 
     static set(key, value) {
-        config.set(key, value);
+        Config.set(key, value);
     }
 
     static show() {
-        const configObject = {};
-        for(let key in config) {
-            if(typeof config[key] != "function") {
-                configObject[key] = config[key];
-            }
-        }
-        log.log(configObject);
+        log.log(Config.list());
     }
 
 }

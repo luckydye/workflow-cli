@@ -1,8 +1,10 @@
 // for module import
 
-const cli = require('./src/cli');
-const config = require('./src/config');
-const log = require('./src/logging');
+const Interface = require('./src/Interface');
+const Command = require('./src/Command');
+const CommandLine = require('./src/CommandLine');
+const Config = require('./src/Config');
+const log = require('./src/Logger');
 
 cli.addCommands(
     require('./src/default/ScriptConfigure'),
@@ -11,9 +13,9 @@ cli.addCommands(
 );
 
 module.exports = {
-    cli: cli,
-    config: config,
-    ShellCommand: cli.ShellCommand,
-    Command: cli.Command,
+    Config: Config,
+    CommandLine: CommandLine,
+    Command: Command,
+    Interface: Interface,
     log: log
 };

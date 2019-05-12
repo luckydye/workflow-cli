@@ -9,11 +9,11 @@ function formatPrefix(str, loglevel) {
     return prefix;
 }
 
-module.exports = {
+module.exports = class Logger {
     
-    prefix: null,
+    static prefix = null;
 
-    log(...str) {
+    static log(...str) {
         if(this.prefix) {
             let prefix = formatPrefix(this.prefix, 0);
             console.log(prefix, ...str);
@@ -21,36 +21,51 @@ module.exports = {
             lastlog = 0;
             console.log(...str);
         }
-    },
+    }
 
-    error(...str) {
+    static error(...str) {
         let prefix = formatPrefix('Error', 1);
         console.error(chalk.bgWhite.red(prefix), ...str);
-    },
+    }
 
-    info(...str) {
+    static info(...str) {
         let prefix = formatPrefix('Info', 2);
         console.log(chalk.bgWhite.black(prefix), ...str);
-    },
+    }
 
-    warn(...str) {
+    static warn(...str) {
         let prefix = formatPrefix('Warning', 3);
         console.log(chalk.bgBlack.yellow(prefix), ...str);
-    },
+    }
 
-    headline(str) {
+    static headline(str) {
         lastlog = 0;
-        console.log(chalk.black.bgWhite('\n', str.padEnd(52, " ")), "\n");
-    },
+        console.log('\n ' + str.padEnd(52, " ") + '\n');
+    }
 
-    updateLine(logType, str, linecount = 1) {
+    static updateLine(logType, str, linecount = 1) {
         process.stdout.clearLine();
         process.stdout.cursorTo(0, process.stdout.rows - (linecount+1));
         this[logType](str);
-    },
+    }
 
-    title(str) {
+    static title(str) {
         process.stdout.write(String.fromCharCode(27) + "]0;" + str + String.fromCharCode(7));
+    }
+
+    static list(items) {
+        for(let item of items) {
+            let strings = [ '  ' ];
+            if(Array.isArray(item)) {
+                for(let section of item) {
+                    strings.push(section);
+                }
+            } else {
+                strings.push(item);
+            }
+            this.log(strings.join(' '));
+        }
+        this.log();
     }
 
 }

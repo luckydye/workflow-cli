@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-const cli = require('./cli');
+const CommandLine = require('./CommandLine');
 
-cli.addCommands(
+CommandLine.addCommands(
     require('./default/ScriptConfigure.js'),
     require('./default/ScriptUpdate.js'),
     require('./default/ScriptScipts.js'),
 );
 
-cli.execute(process.argv.slice(2));
+CommandLine.execute(process.argv.slice(2));

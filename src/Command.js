@@ -1,19 +1,17 @@
 const chalk = require('chalk');
-const config = require('./config');
-const log = require('./logging');
+const log = require('./Logger');
+const Interface = require('./Interface');
 
-class Command {
-
-    // script loading
-    static load(args) {
-        
-    }
+module.exports = class Command {
 
     // command name
     static command = "";
 
     // command description
     static description = "";
+
+    // command description
+    static usage = "";
 
     // command alias
     static alias = null;
@@ -32,6 +30,11 @@ class Command {
 
     // executable parameters
     static parameters = [];
+
+    // script loading
+    static load(args) {
+        
+    }
 
     // execute command
     static execute(args) {
@@ -54,7 +57,7 @@ class Command {
 
     // resolve command arguments
     static resolvearguments(args) {
-        const config = require('./config.js');
+        const config = require('./Config.js');
         const command = args[0];
 
         let valid = false;
@@ -81,7 +84,7 @@ class Command {
         }
 
         if(!valid) {
-            log.info("Invalid argument");
+            log.error("Invalid argument");
             this.help();
         }
     }
@@ -130,67 +133,20 @@ class Command {
             log.error('Command exited with code', err);
         })
     }
-
-    static async contextSelection(title, arr) {
-        return new Promise((resolve, reject) => {
-            require('inquirer').prompt([{
-                type: "list",
-                name: 'selection',
-                message: title,
-                choices: arr
-            }]).then(answers => {
-                resolve(answers);
-            });
-        })
-    }
     
     // display all available arguments to the console
     static help() {
-        const header = `Available arguments${this.command ? ' for ' + this.command : ''}:`;
-        log.headline(header);
-        
-        for(let arg of this.arguments) {
-            if(arg.command) {
-                let command = arg.command.padEnd(12, " ");
-                let desciption = arg.description || "no desciption";
-                let isNew = (Date.now() - arg.added) < (1000 * 60 * 60 * 24 * 7 * 2);
-                if(arg.alias) {
-                    command = command.replace(arg.alias, chalk.underline(arg.alias));
-                }
-                log.log(` ${command} ${isNew ? chalk.green.bold('new') : '   '} | ${desciption}`);
-            }
-        }
-        log.log();
+        log.headline(`Available arguments${this.command ? ' for ' + this.command : ''}:`);
+        const columnWidth = 15;
+        log.list(this.arguments.map(arg => {
+            let isNew = (Date.now() - arg.added) < (1000 * 60 * 60 * 24 * 7 * 2);
+            return [
+                arg.command.padEnd(columnWidth, ' ').replace(arg.alias, chalk.underline(arg.alias)),
+                (arg.usage ? arg.usage : '').padEnd(columnWidth, ' '),
+                (isNew ? chalk.green.bold('new') : '   ') + '  ',
+                arg.description || "no desciption"
+            ]
+        }));
     }
-}
-
-module.exports = class cli extends Command {
-
-    static get Command() {
-        return Command;
-    }
-
-    static get ShellCommand() {
-        return Command;
-    }
-
-    static get config() {
-        return config;
-    }
-
-    static arguments = [
-        {
-            command: 'help',
-            description: "displays this",
-            execute: this.help.bind(this)
-        }
-    ]
-
-    static addCommands(...cmds) {
-        for(let cmd of cmds) {
-            if(this.arguments.indexOf(cmd) === -1) {
-                this.arguments.push(cmd);
-            }
-        }
-    }
+    
 }

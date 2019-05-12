@@ -1,67 +1,66 @@
 const fs = require('fs');
 const path = require('path');
-const log = require('./logging');
+const log = require('./Logger');
 
 const CONFIG_NAME = require('../package.json').name+'.json';
 const CONFIG_PATH = path.resolve(process.env.USERPROFILE, CONFIG_NAME);
 const ALT_CONFIG_PATH = path.resolve(process.cwd(), CONFIG_NAME);
 
-class Config {
+let configStore = {};
+let configLocation = null;
 
-    static getInstance() {
-        if(!globalThis.config) {
-            globalThis.config = new Config();
-        }
-        return globalThis.config;
-    }
-
-    constructor() {
-        this.store = {};
-        this.loadFromFile();
-    }
-
-    get location() {
-        return path.parse(this.configLocation).dir;
-    }
-
-    set(key, value) {
-        if(key && value) {
-            this.store[key] = value;
+function loadFromFile() {
+    try {
+        if(fs.existsSync(ALT_CONFIG_PATH)) {
+            log.info('Using local config');
+            configLocation = ALT_CONFIG_PATH;
+        } else if(!fs.existsSync(CONFIG_PATH)) {
             this.saveToFile();
+            log.info("Config created");
+            configLocation = CONFIG_PATH;
+        } else {
+            configLocation = CONFIG_PATH;
+        }
+        configStore = require(configLocation);
+    } catch(err) {
+        log.error('Error getting config file', err);
+    }
+}
+
+function saveToFile() {
+    const err = fs.writeFileSync(CONFIG_PATH, JSON.stringify(configStore, null, '\t'));
+    if(err) return log.error(err);
+}
+
+loadFromFile();
+
+module.exports = class Config {
+
+    static get location() {
+        return path.parse(configLocation).dir;
+    }
+
+    static set(key, value) {
+        if(key && value) {
+            configStore[key] = value;
+            saveToFile();
         }
     }
 
-    get(key) {
-        const value = this.store[key];
+    static get(key) {
+        const value = configStore[key];
         if(!value) {
             this.set(key, "");
         }
         return value;
     }
 
-    saveToFile() {
-        const err = fs.writeFileSync(CONFIG_PATH, JSON.stringify(this.store, null, '\t'));
-        if(err) return log.error(err);
+    static list() {
+        return configStore;
     }
 
-    loadFromFile() {
-        try {
-            if(fs.existsSync(ALT_CONFIG_PATH)) {
-                log.info('Using local config');
-                this.configLocation = ALT_CONFIG_PATH;
-            } else if(!fs.existsSync(CONFIG_PATH)) {
-                this.saveToFile();
-                log.info("Config created");
-                this.configLocation = CONFIG_PATH;
-            } else {
-                this.configLocation = CONFIG_PATH;
-            }
-            this.store = require(this.configLocation);
-        } catch(err) {
-            log.error('Error getting config file', err);
-        }
+    static saveToFile() {
+        saveToFile();
     }
 
 }
-
-module.exports = Config.getInstance();
