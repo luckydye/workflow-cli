@@ -15,7 +15,7 @@ function loadFromFile() {
             log.info('Using local config');
             configLocation = ALT_CONFIG_PATH;
         } else if(!fs.existsSync(CONFIG_PATH)) {
-            this.saveToFile();
+            saveToFile();
             log.info("Config created");
             configLocation = CONFIG_PATH;
         } else {
