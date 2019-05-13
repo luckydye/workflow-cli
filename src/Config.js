@@ -3,7 +3,7 @@ const path = require('path');
 const log = require('./Logger');
 
 const CONFIG_NAME = require('../package.json').name+'.json';
-const CONFIG_PATH = path.resolve(process.env.USERPROFILE, CONFIG_NAME);
+const CONFIG_PATH = path.resolve(require('os').homedir(), CONFIG_NAME);
 const ALT_CONFIG_PATH = path.resolve(process.cwd(), CONFIG_NAME);
 
 let configStore = {};
