@@ -1,6 +1,5 @@
 const chalk = require('chalk');
 const log = require('./Logger');
-const Interface = require('./Interface');
 
 module.exports = class Command {
 
