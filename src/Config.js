@@ -2,9 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const log = require('./Logger');
 
+const HOME = require('os').homedir();
+const CURRENT_DIR = process.cwd();
 const CONFIG_NAME = require('../package.json').name+'.json';
-const CONFIG_PATH = path.resolve(require('os').homedir(), CONFIG_NAME);
-const ALT_CONFIG_PATH = path.resolve(process.cwd(), CONFIG_NAME);
+
+const CONFIG_PATH = path.resolve(HOME, CONFIG_NAME);
+const ALT_CONFIG_PATH = path.resolve(CURRENT_DIR, CONFIG_NAME);
 
 let configStore = {};
 let configLocation = null;
