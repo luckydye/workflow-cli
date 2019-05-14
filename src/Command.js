@@ -39,7 +39,7 @@ module.exports = class Command {
     static execute(args) {
         // initialize arguemnts
         for(let arg of this.arguments) {
-            if(arg.load) arg.load();
+            if(arg.load) arg.load(args);
         }
 
         if(this.executable !== null) {
@@ -137,7 +137,7 @@ module.exports = class Command {
     static help() {
         log.headline(`Available arguments${this.command ? ' for ' + this.command : ''}:`);
         const columnWidth = 15;
-        log.list(this.arguments.map(arg => {
+        log.list(this.arguments.filter(arg => arg.command).map(arg => {
             let isNew = (Date.now() - arg.added) < (1000 * 60 * 60 * 24 * 7 * 2);
             return [
                 arg.command.padEnd(columnWidth, ' ').replace(arg.alias, chalk.underline(arg.alias)),

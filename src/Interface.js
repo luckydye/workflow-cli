@@ -1,5 +1,3 @@
-const log = require('./Logger');
-
 module.exports = class Interface {
 
     static selection(title, items) {
