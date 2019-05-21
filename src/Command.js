@@ -99,7 +99,7 @@ module.exports = class Command {
                     return inquirer.prompt([{
                         type: "input",
                         name: 'input',
-                        message: `Missing config parameter: ${param}\n>`
+                        message: `Enter value for config paramter: ${param}\n>`
                     }]).then(answers => {
                         if(!answers.input) {
                             return ask();
@@ -114,18 +114,30 @@ module.exports = class Command {
     }
 
     static spawnProcess(exe, args, root) {
+        return this.spawnChildProcess(exe, args, {
+            stdio: 'inherit',
+            cwd: root ? root : process.cwd(),
+            shell: true
+        });
+    }
+
+    static spawnChildProcess(exe, args, options = {
+        stdio: 'pipe'
+    }) {
         return new Promise((resolve, reject) => {
             const { spawn } = require("child_process");
-            const child = spawn(exe, args, {
-                stdio: 'inherit',
-                cwd: root ? root : process.cwd(),
-                shell: true
-            });
+            const child = spawn(exe, args, options);
+            let data = [];
+            if(child.stdout) {
+                child.stdout.on('data', part => {
+                    data.push(part.toString());
+                })
+            }
             child.on('exit', code => {
-                if(code == 0) {
-                    resolve(code);
-                } else {
+                if(code != 0) {
                     reject(code);
+                } else {
+                    resolve(data);
                 }
             });
         }).catch(err => {

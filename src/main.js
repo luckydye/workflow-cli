@@ -3,9 +3,9 @@
 const CommandLine = require('./CommandLine');
 
 CommandLine.addCommands(
-    require('./default/ScriptConfigure.js'),
-    require('./default/ScriptUpdate.js'),
-    require('./default/ScriptScipts.js'),
+    require('./default/ScriptConfigure'),
+    require('./default/ScriptUpdate'),
+    require('./default/ScriptScipts'),
 );
 
 CommandLine.execute(process.argv.slice(2));
